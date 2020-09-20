@@ -1,0 +1,15 @@
+.card-row {
+    margin: 20px 0px 10px 0px ;
+    padding: 15px 0px 15px 0px ;
+}
+
+.text-area {
+    width : 100% ;
+    border: none ;
+    height: auto ;
+    
+}
+
+.room-p {
+    line-height: 0.8;
+}
