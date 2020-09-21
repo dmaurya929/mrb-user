@@ -5,12 +5,14 @@
 .layout-card {
     height: 90px ;
     display: inline-block ;
+    position: relative;
     width: 190px ;
     border-style: solid;
     border-radius: 5px ;
     border-width: 2px ;
     padding: 5px 5px 5px 5px;
     margin: 0px 10px 10px 0px;
+    z-index: 100;
     
 }
 
@@ -27,6 +29,7 @@
     margin: auto 0px ;
     height: 70px ;
     width: 80px ;
+    z-index: -1;
 }
 
 .layout-text{
@@ -87,7 +90,11 @@
     }
     [type="checkbox"]:checked + label:after {
       opacity: 1;
-      transform: scale(1);
+      color: green ;
+      transform: scale(1);  
+    }
+    [type="checkbox"]:checked + label {
+      color: green; 
     }
 
     .check-label {
@@ -95,7 +102,7 @@
         
     }
 
-    .abcc {
+    .no-units {
         width: 60px ;
     }
 

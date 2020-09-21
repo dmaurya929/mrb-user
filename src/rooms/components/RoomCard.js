@@ -12,8 +12,9 @@ const RoomCard = ({ id,img, roomTitle, description, capacity, price, selectedRoo
 
     const priceList = price.map(p => <p className = 'room-p'>{p}</p> ) ;
     
+    
   return (
-    <Row className = "card-row border">
+    <Row className = "card-row border"  >
     <Col md = {5}>
     <Image src={img} fluid />
     <Container>
@@ -30,13 +31,20 @@ const RoomCard = ({ id,img, roomTitle, description, capacity, price, selectedRoo
     </Row>
     </Container> 
     </Col>
-    <Col md = {7}>
-        <h2>{roomTitle}</h2>
-        <textarea className = 'text-area' 
-         ref={(c) => (textarea = c)}
-         value = {description} 
+    <Col md = {7} Style="display: flex; flex-direction: column; justify-content: space-between ">
+        <Row>
+            <h2>{roomTitle}</h2>
+            <textarea className = 'text-area' 
+            ref={(c) => (textarea = c)}
+            value = {description} 
          />
-        <Button id = {id} onClick = { () => { selectedRoomHandler(id, roomTitle) } }  className = 'float-right' variant="primary">Book This Room</Button>           
+          </Row>
+          
+        <Row >
+            <Col>
+            <Button id = {id} onClick = { () => { selectedRoomHandler(id, roomTitle) } }  className = 'float-right' variant="primary">Book This Room</Button>           
+            </Col>
+        </Row>
     </Col>
 </Row>
   )   ;

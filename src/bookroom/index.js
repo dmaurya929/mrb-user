@@ -1,39 +1,53 @@
 import React, { useState } from 'react'
 import { Container, Form, Col, Row , Image, Button} from 'react-bootstrap'
 import img from '../panaromic.jpeg'
-import {Link} from 'react-router-dom' ;
+import {Link, useHistory} from 'react-router-dom' ;
 import "./index.css"
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import TimeSlots from './components/TimeSlots'
 import  getDuration  from './services/bookroomApi' ; 
+import bookRoomActionCreator from './actions' ;
 
 const BookRoom = () => {
 
     const [date, setDate] = useState(null) ;
-    const [selectedDuration, setSelectedDuration] = useState(null) ;
     const [hourSlots, setHourSlots] = useState(true) ;
     const [halfDay, setHalfDay] = useState(null) ;
     const [day, setDay] = useState(false) ;
+
+    // Booking details
+    const [selectedDuration, setSelectedDuration] = useState(null) ;
     const [attendees, setAttendees] = useState(1) ;
+    const [selHourSlots, setSelHourSlots] = useState("00000000000000") ;
+    const [timeSlots, setTimeSlots] = useState(null) ;
     
 
     const booking = useSelector( storeState => storeState.bookingState) ;
     const room = useSelector( storeState => storeState.roomsState.find(room => room.id == booking.roomId)) ;
+    const dispatch = useDispatch() ;
+    const history = useHistory() ;
+    const { bookRoom } = bookRoomActionCreator ;
 
     const dateChangeHandler = async (evt) => {
         const dt = evt.target.value ;
-        const response = await getDuration(room.id, dt) ;
-        
-            
+
+        // Fetching from serer about availability of time slot
+        const response = await getDuration(room.id, dt) ;    
         const { hourSlots, halfDay, day} = response ;
         setHourSlots(hourSlots) ;
         setHalfDay(halfDay) ;
         setDay(day) ;
+
         setDate(dt) ;
-        
+        setTimeSlots("00000000000000")
     }
 
     const durationHandler = (evt) => {
+        const bookingType = evt.target.value ; 
+        
+        if(bookingType === "1") setTimeSlots("10") ;
+        else if(bookingType === "2") setTimeSlots("01") ;
+        else if(bookingType === "3") setTimeSlots("1") ;
         setSelectedDuration(evt.target.value) ;
     }
 
@@ -43,14 +57,31 @@ const BookRoom = () => {
     }
     const hourSlotHandler = (evt, i) => {
         let clss = evt.target.className ;
-        console.log(i) ;
+        let timeslots = selHourSlots.slice() ;
+        
         if(clss.includes("btn-outline-primary")){
-        clss = clss.replace("btn-outline-primary", "btn-primary") ;
+        clss = clss.replace("btn-outline-primary", "btn-primary") ;        
+        timeslots = timeslots.substring(0, i) + "1" + timeslots.substring(i+1);        
         }
         else {
         clss = clss.replace("btn-primary","btn-outline-primary") ;
+        timeslots = timeslots.substring(0, i) + "0" + timeslots.substring(i+1);  
         }
+        setSelHourSlots(timeslots) ;
+        setTimeSlots(timeslots)
         evt.target.className = clss ;
+    }
+
+    const bookRoomHandler = () => {
+        const bookRoom_ = {
+            date: date,
+            bookForType: selectedDuration ,
+            timeSlots: timeSlots,
+            attendees: attendees
+        } ;
+        dispatch(bookRoom(bookRoom_)) ;
+        history.push("./roomsetup") ;
+
     }
 
 
@@ -65,8 +96,8 @@ const BookRoom = () => {
     if(room.bookForHalfDay) {
         prices.push(`$${room.priceForHalfDay} for half day`) ;
         if(halfDay != null) {
-             durationList.push(<option value = "1">Half Day - Morning</option>) ;
-            durationList.push(<option value = "2">Half Day - Afternoon</option>) ;
+            if(halfDay[0] === "1") durationList.push(<option value = "1">Half Day - Morning</option>) ;
+            if(halfDay[1] === "1") durationList.push(<option value = "2">Half Day - Afternoon</option>) ;
         }
     }
     if(room.bookForDay){
@@ -85,10 +116,10 @@ const BookRoom = () => {
     return (
         <Row className = "card-row border">
             <Col md = {4}>
-            <Image src={img} fluid />
+            <Image src={room.image} fluid />
             <Container>
             <Row >
-                <Col noGutters>
+                <Col Style="padding:0px" noGutters>
                     <h5>Price:</h5>
                     {priceList}
                 </Col>
@@ -143,7 +174,7 @@ const BookRoom = () => {
                         <Link to="/rooms"> <Button variant="secondry"  className="border border-black pr-4 pl-4">Back</Button></Link>
                         </Col>
                         <Col >
-                        <Link to="/roomsetup"><Button variant="primary" className="pr-4 pl-4">Next</Button></Link>
+                        <Button variant="primary" className="pr-4 pl-4" onClick = { bookRoomHandler }>Next</Button>
                         </Col>
                     </Form.Group>
                  </Form>           
